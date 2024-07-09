@@ -29,7 +29,7 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Ты написал: "+update.Message.Text)
 			bot.Send(msg)
 		}
 	}
