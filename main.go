@@ -33,7 +33,7 @@ func main() {
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			userID := update.Message.From.ID
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Ты "+strconv.FormatInt(userID, 100)+" написал: "+update.Message.Text)
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Ты "+strconv.FormatInt(userID, 36)+" написал: "+update.Message.Text)
 			bot.Send(msg)
 		}
 	}
