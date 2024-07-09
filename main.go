@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -53,8 +54,11 @@ func main() {
 			// Increment the message count for the user
 			count := incrementMessageCount(userID)
 
+			// Convert userID to string
+			userIDStr := strconv.FormatInt(userID, 10)
+
 			// Prepare the response message
-			responseText := fmt.Sprintf("Ты написал: %s\nВсего сообщений: %d", userMessage, count)
+			responseText := fmt.Sprintf("Ты (%s) написал: %s\nВсего сообщений: %d", userIDStr, userMessage, count)
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
 			bot.Send(msg)
