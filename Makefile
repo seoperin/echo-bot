@@ -13,7 +13,6 @@ build:
 # Перезапустить контейнеры
 up:
 	docker-compose up -d
-	docker-compose build
 
 # Запуск
 run: build up
