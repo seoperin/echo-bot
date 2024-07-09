@@ -6,17 +6,20 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 var (
-	messageCounts map[int64]int
-	mutex         sync.Mutex
+	messageCounts   map[int64]int
+	lastMessageTime map[int64]time.Time
+	mutex           sync.Mutex
 )
 
 func init() {
 	messageCounts = make(map[int64]int)
+	lastMessageTime = make(map[int64]time.Time)
 }
 
 func incrementMessageCount(userID int64) int {
@@ -24,6 +27,18 @@ func incrementMessageCount(userID int64) int {
 	defer mutex.Unlock()
 	messageCounts[userID]++
 	return messageCounts[userID]
+}
+
+func updateLastMessageTime(userID int64) {
+	mutex.Lock()
+	defer mutex.Unlock()
+	lastMessageTime[userID] = time.Now()
+}
+
+func getLastMessageTime(userID int64) time.Time {
+	mutex.Lock()
+	defer mutex.Unlock()
+	return lastMessageTime[userID]
 }
 
 func main() {
@@ -54,11 +69,23 @@ func main() {
 			// Increment the message count for the user
 			count := incrementMessageCount(userID)
 
+			// Update the last message time for the user
+			lastMessageTime := getLastMessageTime(userID)
+			updateLastMessageTime(userID)
+
+			// Calculate the time difference
+			var timeDiff string
+			if !lastMessageTime.IsZero() {
+				timeDiff = time.Since(lastMessageTime).String()
+			} else {
+				timeDiff = "Это ваше первое сообщение."
+			}
+
 			// Convert userID to string
 			userIDStr := strconv.FormatInt(userID, 10)
 
 			// Prepare the response message
-			responseText := fmt.Sprintf("Ты (%s) написал: %s\nВсего сообщений: %d", userIDStr, userMessage, count)
+			responseText := fmt.Sprintf("Ты (%s) написал: %s\nВсего сообщений: %d\nПрошло времени с последнего сообщения: %s", userIDStr, userMessage, count, timeDiff)
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
 			bot.Send(msg)
