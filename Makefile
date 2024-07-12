@@ -8,11 +8,15 @@ update:
 
 # Пересобрать Docker образ
 build:
-	docker-compose build
+	docker compose build
 
 # Перезапустить контейнеры
 up:
-	docker-compose up -d
+	docker compose up -d
+
+# Остановить контейнеры
+down:
+	docker compose down
 
 # Запуск
 run: build up
