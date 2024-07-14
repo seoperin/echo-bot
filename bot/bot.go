@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
 	"sync"
 	"time"
@@ -56,6 +57,9 @@ func StartBot(botToken string, db *sql.DB) {
 
 	updates := bot.GetUpdatesChan(u)
 
+	numbers := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	for update := range updates {
 		if update.Message != nil { // If we got a message
 			userID := update.Message.From.ID
@@ -79,8 +83,17 @@ func StartBot(botToken string, db *sql.DB) {
 			// Convert userID to string
 			userIDStr := strconv.FormatInt(userID, 10)
 
+			// Random number
+			randomIndex := r.Intn(len(numbers))
+			randomNumber := numbers[randomIndex]
+
 			// Prepare the response message
-			responseText := fmt.Sprintf("Ты (%s) написал: %s\nВсего сообщений: %d\nПрошло времени с последнего сообщения: %s", userIDStr, userMessage, count, timeDiff)
+			messagePart := fmt.Sprintf("Ты (%s) написал: %s", userIDStr, userMessage)
+			countPart := fmt.Sprintf("Всего сообщений: %d", count)
+			timeDiffPart := fmt.Sprintf("Прошло времени с последнего сообщения: %s", timeDiff)
+			randomNumberPart := fmt.Sprintf("Случайное число: %d", randomNumber)
+
+			responseText := messagePart + "\n" + countPart + "\n" + timeDiffPart + "\n" + randomNumberPart
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
 			bot.Send(msg)
